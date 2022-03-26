@@ -1,0 +1,6 @@
+master
+fb70cc6a5de643e9dad13195f9806a4299db2baf
+(UTC) Tue Feb 15 23:06:03 2022
+3D Quadratic APIC
+./incompressible_flow --example 20 -N 15 --pto --max_dt .03 --max_cg_iterations 100 --max_la_iterations 100 --la_tol=1e-4 --output_dir build/output3d_15
+
