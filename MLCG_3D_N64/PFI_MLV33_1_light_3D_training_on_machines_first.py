@@ -68,7 +68,10 @@ CG = cg.ConjugateGradientSparse(A_sparse)
 #d_name = "b_rhs_eigvector_first_half_10_last_half_90_new_random_N"
 #d_name = "b_rhs_20000_eigvector_first_half_10_last_half_90_random_N"
 #d_name = "b_rhs_20000_10000_ritz_vectors_first_half_10_last_half_90_random_N63"
-d_name = "b_rhs_20000_10000_ritz_vectors_V2_for_3D_random_N63"
+d_name = "b_rhs_20000_10000_ritz_vectors_V2_for_3D_random_N63" #--this one works best
+d_name = "b_rhs_20000_10000_ritz_vectors_V2_for_3D_random_N63" #--this one works best
+
+
 #d_name = "b_rhs_20000_10000_ritz_vectors_combined_3_N63"
 print(d_name)
 #d_name = "b_rhs_10000_eigvector_equidistributed_random_N"

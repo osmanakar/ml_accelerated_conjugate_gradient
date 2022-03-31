@@ -64,16 +64,17 @@ name_sparse_matrix = project_folder_general+"data/A_Sparse_3D_N"+str(dim-1)+".np
 A_sparse = sparse.load_npz(name_sparse_matrix)
 CG = cg.ConjugateGradientSparse(A_sparse)
 
-input("Press Enter to continue...b_rhs is about to load")
+#input("Press Enter to continue...b_rhs is about to load")
 
 
 #%% Data Loading 2
-d_name = "b_rhs_10000_1_10000_faulty_ritz_vectors_V2_for_3D_random_N"
+d_name = "x_train_x_test_10000_1_10000_faulty_ritz_vectors_V2_for_3D_random_N"
+filename = project_data_folder + d_name + str(dim-1) + "_tf"
 print("Loading ... "+d_name)
 
-filename = project_data_folder + d_name + str(dim-1) + "_tf"
 with open(filename, "rb") as f:
-    x_train, x_test = pickle.load(f)
+    x_train, x_test = pickle.load(f) #tensorflow arrays
+
 
 
 
@@ -113,8 +114,10 @@ apa = layers.Conv3D(fil_num, (3, 3, 3), activation='relu', padding='same')(apb) 
 upa = layers.UpSampling3D((2, 2,2))(apa) + lb
 upb = layers.Conv3D(fil_num, (3, 3, 3), activation='relu', padding='same')(upa) 
 upa = layers.Conv3D(fil_num, (3, 3, 3), activation='relu', padding='same')(upb) + upa
+upb = layers.Conv3D(fil_num, (3, 3, 3), activation='relu', padding='same')(upa) 
+upa = layers.Conv3D(fil_num, (3, 3, 3), activation='relu', padding='same')(upb) + upa
 
-la = layers.Dense(fil_num, activation='linear')(la)
+la = layers.Dense(fil_num, activation='linear')(upa)
 last_layer = layers.Dense(1, activation='linear')(upa)
 
 model = keras.Model(input_rhs, last_layer)

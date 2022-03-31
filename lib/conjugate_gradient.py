@@ -1379,6 +1379,65 @@ class ConjugateGradientSparse:
             diagonal[it] = np.dot(Q[it], self.multiply_A_sparse(Q[it]))
         
         return Q, diagonal, sub_diagonal
+    
+#from numba import njit, prange
+#    @njit(parallel=True)
+    def lanczos_iteration_with_normalization_correction_parallel(self, b, max_it=10, tol=1.0e-10):
+        Q = np.zeros([max_it, len(b)])
+        if max_it==1:
+            Q[0]=b.copy()
+            Q[0]=Q[0]/self.norm(Q[0])
+            return Q, [np.dot(Q[0],self.multiply_A_sparse(Q[0]))], []
+        if max_it<=0:
+            print("CG.lanczos_iteration: max_it can never be less than 0")
+        if max_it > self.n:
+            max_it = self.n
+            print("max_it is reduced to the dimension ",self.n)
+        diagonal = np.zeros(max_it)
+        sub_diagonal = np.zeros(max_it)
+        #norm_b = np.linalg.norm(b)
+        norm_b = self.norm(b)
+        Q[0] = b.copy()/norm_b
+        #Q[1] = np.matmul(self.A, Q[0])
+        Q[1] = self.multiply_A_sparse(Q[0])
+        diagonal[0] = np.dot(Q[1],Q[0])
+        Q[1] = Q[1] - diagonal[0]*Q[0]
+        #sub_diagonal[0] = np.linalg.norm(Q[1])
+        sub_diagonal[0] = self.norm(Q[1])
+        Q[1] = Q[1]/sub_diagonal[0]
+        if sub_diagonal[0]<tol:
+            Q = np.resize(Q,[1,self.n])
+            diagonal = np.resize(diagonal, [1])
+            sub_diagonal = np.resize(sub_diagonal, [0])
+            return Q, diagonal, sub_diagonal
+        
+        invariant_subspace = False
+        it = 1
+        while ((it<max_it-1) and (not invariant_subspace)):
+            if it%50==0:
+                print("Lanczoz it = ",it)
+            #Q[it+1] = np.matmul(self.A, Q[it])
+            Q[it+1] = self.multiply_A_sparse(Q[it])
+            diagonal[it] = np.dot(Q[it],Q[it+1])            
+            v = Q[it+1] - diagonal[it]*Q[it]-sub_diagonal[it-1]*Q[it-1]
+            for j in range(it-1):
+                vQj = self.dot(v, Q[j])
+                for jj in range(v.shape[1]):
+                    v[jj] = v[jj] - Q[j,jj]*vQj
+            Q[it+1] = v.copy()
+            sub_diagonal[it] = self.norm(Q[it+1])
+            Q[it+1] = Q[it+1]/sub_diagonal[it]
+            if sub_diagonal[it] < tol:
+                invariant_subspace = True
+            it = it+1
+            
+        Q = np.resize(Q, [it+1,self.n])
+        diagonal = np.resize(diagonal, [it+1])
+        sub_diagonal = np.resize(sub_diagonal, [it])
+        if not invariant_subspace:
+            diagonal[it] = np.dot(Q[it], self.multiply_A_sparse(Q[it]))
+        
+        return Q, diagonal, sub_diagonal
 
 
     def restarted_pcg_manual(self, b, mult_precond_method, max_outer_it = 100, pcg_inner_it = 1, tol = 1.0e-15, verbose = False):

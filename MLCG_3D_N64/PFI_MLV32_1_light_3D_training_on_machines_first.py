@@ -68,7 +68,9 @@ CG = cg.ConjugateGradientSparse(A_sparse)
 #d_name = "b_rhs_eigvector_first_half_10_last_half_90_new_random_N"
 #d_name = "b_rhs_20000_eigvector_first_half_10_last_half_90_random_N"
 #d_name = "b_rhs_20000_10000_ritz_vectors_first_half_10_last_half_90_random_N63"
-d_name = "b_rhs_20000_10000_ritz_vectors_V2_for_3D_random_N63"
+#d_name = "b_rhs_20000_10000_ritz_vectors_V2_for_3D_random_N63"
+d_name = "b_rhs_20000_10000_A_cos_vectors_V2_for_3D_random_N63"
+
 #d_name = "b_rhs_20000_10000_ritz_vectors_combined_3_N63"
 print(d_name)
 #d_name = "b_rhs_10000_eigvector_equidistributed_random_N"
@@ -123,7 +125,6 @@ fil_num=24
 input_rhs = keras.Input(shape=(dim, dim, dim, 1))
 first_layer = layers.Conv3D(fil_num, (3, 3, 3), activation='linear', padding='same')(input_rhs)
 la = layers.Conv3D(fil_num, (3, 3, 3), activation='relu', padding='same')(first_layer)
-
 lb = layers.Conv3D(fil_num, (3, 3, 3), activation='relu', padding='same')(la)
 la = layers.Conv3D(fil_num, (3, 3, 3), activation='relu', padding='same')(lb) + la
 lb = layers.Conv3D(fil_num, (3, 3, 3), activation='relu', padding='same')(la)

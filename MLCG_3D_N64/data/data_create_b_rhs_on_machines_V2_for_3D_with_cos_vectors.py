@@ -33,43 +33,13 @@ A_sparse = sparse.load_npz(name_sparse_matrix)
 CG = cg.ConjugateGradientSparse(A_sparse)
 
 
-#%% Saving and loading ritz values
-print("Loading Ritz Vectors")
-with open(project_data_folder+'ritz_vectors_10000_3D_N'+str(dim-1)+'.npy', 'rb') as f:
-    ritz_vectors = np.load(f)
-    
-#ritz_vectors = ritz_vectors[::-1]
-print(sum(sum(ritz_vectors[0:10000-100])))
-print("Computing Ritz Values")
-ritz_values = CG.create_ritz_values(ritz_vectors)
-print(ritz_values[9950:10000])
-
-#%%
-for i in range(1000):
-    if abs(sum(ritz_vectors[i])) >1.0e-5:
-        print(i, sum(ritz_vectors[i]))
-
-#%% Testing
-print("testing")
-i = 6000
-j = 6000
-print("i = ",i,", j = ",j)
-print(CG.dot(ritz_vectors[i], CG.multiply_A_sparse(ritz_vectors[j])))
-print(ritz_values[i])
-i = 6000
-j = 9000
-print("i = ",i,", j = ",j)
-print(CG.dot(ritz_vectors[i], CG.multiply_A_sparse(ritz_vectors[j])))
-print(ritz_values[i])
-#%%
-
-print("Ritz Values")
-print(ritz_values[0:20])
-print(ritz_values[9980:10000])
 
 #%%
 #This part
-num_ritz_vectors=10000
+with open(project_data_folder+'A_cos_vec_10000_ritz_vectors_V2_for_3D_random_N'+str(dim-1)+'.npy', 'wb') as f:
+    ritz_vectors = np.load(f)
+#%%
+num_ritz_vectors = 10000
 cut_idx = int(num_ritz_vectors/2)-500
 num_zero_ritz_vals = 1
 sample_size = 20000
@@ -111,7 +81,7 @@ for it in range(0,20):
     r_b = small_size*(it+1)
     print(it)
     b_rhs[l_b:r_b] = np.matmul(ritz_vectors[0:num_ritz_vectors-num_zero_ritz_vals].transpose(),coef_matrix[:,l_b:r_b]).transpose()
-    
+
     #% % Making sure b is in the range of A
     for i in range(l_b,r_b):
         if i%100 == 0:
