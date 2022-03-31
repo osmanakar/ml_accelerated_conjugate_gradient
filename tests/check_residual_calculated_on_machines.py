@@ -36,13 +36,16 @@ CG = cg.ConjugateGradientSparse(A_sparse)
 #%%
 hyde01_folder_name = "oak@hyde01.dabh.io:~/projects/ML_preconditioner_project/MLCG_3D_N64/data/test_picking_best_model/"
 #project_folder_subname = "MLV32_3_T1_3D_N64_ritz_vectors_20000_10000_V2_for_3D" #1,160
-#project_folder_subname = "MLV33_1_T1_3D_N64_ritz_vectors_20000_10000_V2_for_3D" #1,45
-project_folder_subname = "MLV33_2_T1_3D_N64_ritz_vectors_20000_10000_V2_for_3D" #1,129
-project_folder_subname = "MLV37_1_5conv_T1_3D_N64_ritz_vectors_20000_10000_V2_for_3D" #1,148; 140, 257
+project_folder_subname = "MLV33_1_T1_3D_N64_ritz_vectors_20000_10000_V2_for_3D" #1,45
+#project_folder_subname = "MLV33_2_T1_3D_N64_ritz_vectors_20000_10000_V2_for_3D" #1,129
+#project_folder_subname = "MLV37_1_5conv_T1_3D_N64_ritz_vectors_20000_10000_V2_for_3D" #1,148; 140, 257
+#project_folder_subname = "MLV32_1_T3_3D_N64_A_cos_vectors_faulty_DCT1_20000_10000_V2_for_3D" #1,44
+#project_folder_subname = "MLV33_1_T2_3D_N64_A_cos_vectors_20000_10000_V2_for_3D" #1,157; 157,227
 
 
-epoch_num_start = 140
-epoch_num_finish = 257
+
+epoch_num_start = 1
+epoch_num_finish = 45
 res_arr_name = "res_arr_matrix_"+project_folder_subname+str(epoch_num_start)+"_"+str(epoch_num_finish)+".npy"
 scp_hyde01_file = hyde01_folder_name+res_arr_name
 mac_saving_place = "/Users/osmanakar/Desktop/research_related_icloud_temp/3D_residuals_pick_best_model/"
@@ -55,8 +58,8 @@ res_arr_matrix = np.zeros([1000,res_arr_matrix_load.shape[1]])
 #%%
 res_arr_matrix[epoch_num_start:epoch_num_finish,:]=res_arr_matrix_load[epoch_num_start:epoch_num_finish,:]
 #%%
-tol = 1.0e-4
-idx= 11
+tol = 1.0e-6
+idx= 100
 good_epochs = []
 for i in range(1,epoch_num_finish):
     res0 = res_arr_matrix[i,idx]
@@ -66,15 +69,52 @@ for i in range(1,epoch_num_finish):
 #%%
 %matplotlib qt
 plot_num =101
+good_epochs = [50,100,120,125,151]
 
 for i in range(len(good_epochs)):
-    plt.plot(np.log10(res_arr_matrix[good_epochs[i],0:plot_num]),label=str(good_epochs[i]))
+    plt.plot(np.log10(res_arr_matrix[good_epochs[i],0:plot_num]),label="cos-trained-E"+str(good_epochs[i]))
+
+good_epochs = [43]
+for i in range(len(good_epochs)):
+    plt.plot(np.log10(res_arr_matrix_load[good_epochs[i],0:plot_num]),label="ritz-trained-E"+str(good_epochs[i]))
 
 #plt.plot(np.log10(res_arr_matrix[8,0:plot_num]) ,label='ML+CG-2')
 #plt.plot(np.log10(hf.extend_array(res_arr_ML_cg4[0:50], 4)) ,label='ML+CG-4')
 #plt.plot(np.log10(hf.extend_array(res_arr_ML_cg10[0:20], 10)) ,label='ML+CG-10')
 
 plt.legend()
+
+
+#%% 
+print("Checking Training & Validation Loss")
+#/home/oak/projects/ML_preconditioner_project/MLCG_3D_N64/MLV33_1_T2_3D_N64_A_cos_vectors_20000_10000_V2_for_3D
+
+project_folder_subname = "MLV33_1_T2_3D_N64_A_cos_vectors_20000_10000_V2_for_3D" #1,157
+hyde01_folder_name_general = "oak@hyde01.dabh.io:~/projects/ML_preconditioner_project/MLCG_3D_N64/"
+scp_hyde01_training_loss = hyde01_folder_name_general+project_folder_subname+"/MLCG_3D_N64_training_loss.npy"
+scp_hyde01_validation_loss = hyde01_folder_name_general+project_folder_subname+"/MLCG_3D_N64_validation_loss.npy"
+mac_saving_place = "/Users/osmanakar/Desktop/research_related_icloud_temp/training_validation_losses/"
+os.system("scp -r "+ scp_hyde01_training_loss + " "+ mac_saving_place)
+os.system("scp -r "+ scp_hyde01_validation_loss + " "+ mac_saving_place)
+
+with open(mac_saving_place+"/MLCG_3D_N64_training_loss.npy", 'rb') as f:
+    training_loss = np.load(f)
+
+with open(mac_saving_place+"/MLCG_3D_N64_validation_loss.npy", 'rb') as f:
+    validation_loss = np.load(f)
+
+#%%
+plt.plot((training_loss[50:180]),label="training_loss")
+plt.plot((validation_loss[50:180]),label="validation_loss")
+
+
+
+
+
+
+
+
+
 
 #%%
 dim = 16
