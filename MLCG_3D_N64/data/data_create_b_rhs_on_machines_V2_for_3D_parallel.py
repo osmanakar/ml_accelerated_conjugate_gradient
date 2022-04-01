@@ -1,4 +1,4 @@
-project_name = "MLCG_3D_N128"
+project_name = "MLCG_3D_N64"
 #project_folder_general = "/home/osman/projects/ML_preconditioner_project/"+project_name+"/"
 project_folder_general = "/home/oak/projects/ML_preconditioner_project/"+project_name+"/"
 project_data_folder = "/home/oak/projects/ML_preconditioner_project/data/"+project_name+"/"
@@ -19,7 +19,7 @@ import helper_functions as hf
 
 #%% Creating ConjugateGradientSparse Object
 print("Creating ConjugateGradientSparse Object")
-dim = 128
+dim = 64
 dim2 = dim**3
 #pres_lap_sparse = pl.pressure_laplacian_sparse(dim-1)
 #pres_lap = pl.pressure_laplacian(dim-1)
@@ -91,7 +91,7 @@ r_cut_idx2 = cut_idx4 - cut_idx2
 r_cut_idx3 = cut_idx4 - cut_idx3
 r_cut_idx4 = 0
 
-sample_size = 1000
+sample_size = 20000
 """
 sample_size = 20000
 coef_matrix = np.random.normal(0,1, [cut_idx4,sample_size])
@@ -127,7 +127,7 @@ print("numba")
 print(" Creating Rhs's")
 for it in range(0,100):
     t0=time.time()
-    small_size = 10
+    small_size = 200
     sample_size = small_size
     coef_matrix = np.random.normal(0,1, [cut_idx4,sample_size])
     coef_matrix[r_cut_idx1:r_cut_idx0] = 9*np.random.normal(0,1, [r_cut_idx0-r_cut_idx1,sample_size])
@@ -142,7 +142,7 @@ for it in range(0,100):
 
     #% % Making sure b is in the range of A
     for i in range(l_b,r_b):
-        if i%1 == 0:
+        if i%10 == 0:
             print(i)
         #b_rhs[0] = b_rhs[0] - sum(b_rhs[0][reduced_idx])/len(reduced_idx)
         #b_rhs[0][zero_idxs]=0
@@ -164,7 +164,7 @@ print(m1,m2)
 print(sum(sum(b_rhs)), np.linalg.norm(b_rhs)**2, sum(b_rhs[m1]), np.linalg.norm(b_rhs[m1]),sum(b_rhs[m2]), np.linalg.norm(b_rhs[m2]))
 
 #%%
-with open(project_data_folder+'b_rhs_1000_10000_faulty_ritz_vectors_V2_for_3D_random_N'+str(dim-1)+'.npy', 'wb') as f:
+with open(project_data_folder+'b_rhs_20000_10000_faulty_ritz_vectors_V2_for_3D_random_N'+str(dim-1)+'.npy', 'wb') as f:
     np.save(f, b_rhs)
 #%%
 """

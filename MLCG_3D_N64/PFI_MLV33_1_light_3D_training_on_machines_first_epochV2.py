@@ -31,7 +31,7 @@ epoch_num = int(sys.argv[1])
 epoch_each_iter = int(sys.argv[2])
 b_size = int(sys.argv[3])
 loading_number = int(sys.argv[4])
-gpu_usage = int(1024*np.double(sys.argv[5]))
+#gpu_usage = int(1024*np.double(sys.argv[5]))
 
 #lr = np.double(sys.argv[5])
 lr = 1.0e-4
@@ -50,7 +50,7 @@ if gpus:
   # Restrict TensorFlow to only use the first GPU
   try:
     tf.config.set_visible_devices(gpus[0], 'GPU')
-    tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=gpu_usage)])
+    #tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=gpu_usage)])
     logical_gpus = tf.config.list_logical_devices('GPU')
     print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
   except RuntimeError as e:
@@ -131,7 +131,9 @@ validation_loss = []
 #d_name = "b_rhs_20000_eigvector_first_half_10_last_half_90_random_N"
 #d_name = "b_rhs_20000_10000_ritz_vectors_first_half_10_last_half_90_random_N63"
 #d_name = "b_rhs_20000_10000_ritz_vectors_V2_for_3D_random_N63"
-d_name = "b_rhs_20000_10000_A_cos_vectors_V2_for_3D_random_N63"
+#d_name = "b_rhs_20000_10000_A_cos_vectors_V2_for_3D_random_N63"
+d_name = "b_rhs_20000_10000_faulty_ritz_vectors_V2_for_3D_random_N63"
+
 #d_name = "b_rhs_20000_10000_ritz_vectors_combined_3_N63"
 print(d_name)
 
@@ -157,15 +159,15 @@ for i in range(1,epoch_num):
         #d_name = "b_rhs_10000_eigvector_equidistributed_random_N"
         # Loasing the data
         for j in range(loading_number):
-            with open(foldername+str(loading_number*ii+j)+'.npy', 'rb') as f:  
+            with open(foldername+str(perm[loading_number*ii+j])+'.npy', 'rb') as f:  
                 b_rhs[j] = np.load(f)
         
         sub_train_size = round(0.9*loading_number)
         sub_test_size = loading_number - sub_train_size
         iiln = ii*loading_number
-        x_train = tf.convert_to_tensor(b_rhs[perm[iiln:iiln+sub_train_size]].reshape([sub_train_size,dim,dim,dim,1]),dtype=tf.float32) 
-        x_test = tf.convert_to_tensor(b_rhs[perm[iiln+sub_train_size:iiln+loading_number]].reshape([sub_test_size,dim,dim,dim,1]),dtype=tf.float32)         
-        
+        x_train = tf.convert_to_tensor(b_rhs[0:sub_train_size].reshape([sub_train_size,dim,dim,dim,1]),dtype=tf.float32) 
+        x_test = tf.convert_to_tensor(b_rhs[sub_train_size:loading_number].reshape([sub_test_size,dim,dim,dim,1]),dtype=tf.float32)         
+         
         hist = model.fit(x_train,x_train,
                         epochs=epoch_each_iter,
                         batch_size=b_size,

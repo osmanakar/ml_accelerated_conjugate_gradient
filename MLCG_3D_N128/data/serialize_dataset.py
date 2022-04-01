@@ -39,7 +39,7 @@ CG = cg.ConjugateGradientSparse(A_sparse)
 with open(project_data_folder+'b_rhs_10000_2_10000_faulty_ritz_vectors_V2_for_3D_random_N'+str(dim-1)+'.npy', 'rb') as f:
     ritz_vectors = np.load(f)
 
-num_vectors = 10000
+num_vectors = 20000
 foldername = project_data_folder+'b_rhs_20000_10000_faulty_ritz_vectors_V2_for_3D_random_N'+str(dim-1)+'/'
 
 for i in range(num_vectors):

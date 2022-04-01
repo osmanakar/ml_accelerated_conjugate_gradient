@@ -28,11 +28,11 @@ dim = 64
 dim2 = dim**3
 
 
-pres_lap = pl.pressure_laplacian_3D_sparse(dim-1)
-A_sparse = pres_lap.A_sparse
+#pres_lap = pl.pressure_laplacian_3D_sparse(dim-1)
+#A_sparse = pres_lap.A_sparse
 name_sparse_matrix = project_folder_general+"data/A_Sparse_3D_N"+str(dim-1)+".npz"
-sparse.save_npz(name_sparse_matrix, pres_lap.A_sparse)
-#A_sparse = sparse.load_npz(name_sparse_matrix)
+#sparse.save_npz(name_sparse_matrix, pres_lap.A_sparse)
+A_sparse = sparse.load_npz(name_sparse_matrix)
 #CG = cg.ConjugateGradientSparse(pres_lap.A_sparse)
 CG = cg.ConjugateGradientSparse(A_sparse)
 
@@ -45,8 +45,8 @@ rand_vec = CG.multiply_A_sparse(rand_vec_x)
 #%%
 print("Creating Ritz Vectors")
 num_vectors = num_ritz_vectors
-#W, diagonal, sub_diagonal = CG.lanczos_iteration(rand_vec, num_vectors, 1.0e-12)
-W, diagonal, sub_diagonal = CG.lanczos_iteration_with_normalization_correction(rand_vec, num_vectors, 1.0e-10)
+W, diagonal, sub_diagonal = CG.lanczos_iteration(rand_vec, num_vectors, 1.0e-12)
+#W, diagonal, sub_diagonal = CG.lanczos_iteration_with_normalization_correction(rand_vec, num_vectors, 1.0e-10)
 
 #%%
 tri_diag = np.zeros([num_vectors,num_vectors])
@@ -108,7 +108,7 @@ print(ritz_values[i])
 #%% Sacving and loading ritz values
 print("Saving Ritz Values")
 #MLproject_data_folder = "/media/data/osman/ML_preconditioner_project/data"
-with open(project_data_folder+'ritz_vectors_'+str(num_ritz_vectors)+'_3D_N'+str(dim-1)+'.npy', 'wb') as f:
+with open(project_data_folder+'faulty_ritz_vectors_'+str(num_ritz_vectors)+'_3D_N'+str(dim-1)+'.npy', 'wb') as f:
     np.save(f, ritz_vectors)
     
 """

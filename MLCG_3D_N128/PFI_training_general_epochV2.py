@@ -9,10 +9,10 @@ import gc
 import scipy.sparse as sparse
 #import matplotlib.pyplot as plt
 
-dim = 64
+dim = 128
 dim2 = dim**3
 
-project_name = "MLCG_3D_N64"
+project_name = "MLCG_3D_N128"
 project_folder_subname = os.path.basename(os.getcwd())
 print(project_folder_subname)
 machine_name = "hyde01"
@@ -35,32 +35,44 @@ epoch_num = int(sys.argv[1])
 epoch_each_iter = int(sys.argv[2])
 b_size = int(sys.argv[3])
 loading_number = int(sys.argv[4])
-#gpu_usage = int(1024*np.double(sys.argv[5]))
+gpu_usage = int(1024*np.double(sys.argv[5]))
+#lr = np.double(sys.argv[5])
 lr = 1.0e-4
-project_folder_subname = os.path.basename(os.getcwd())
 
 """
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
   try:
-    tf.config.experimental.set_virtual_device_configuration(gpus[1], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=gpu_usage)])
     tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=gpu_usage)])
-    #tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=gpu_usage)])
   except RuntimeError as e:
     print(e)
 """
+"""
+# Using the second gpu
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   # Restrict TensorFlow to only use the first GPU
   try:
-    tf.config.set_visible_devices(gpus[1], 'GPU')
+    #tf.config.set_visible_devices(gpus[0], 'GPU')
     logical_gpus = tf.config.list_logical_devices('GPU')
+    tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=gpu_usage)])
     print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
   except RuntimeError as e:
     # Visible devices must be set before GPUs have been initialized
     print(e)
-
-
+"""
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+  # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
+  try:
+    tf.config.set_logical_device_configuration(
+        gpus[0],
+        [tf.config.LogicalDeviceConfiguration(memory_limit=gpu_usage)])
+    logical_gpus = tf.config.list_logical_devices('GPU')
+    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+  except RuntimeError as e:
+    # Virtual devices must be set before GPUs have been initialized
+    print(e)
 
 #%%
 name_sparse_matrix = project_folder_general+"data/A_Sparse_3D_N"+str(dim-1)+".npz"
@@ -125,7 +137,7 @@ print(validation_loss)
 #d_name = "b_rhs_20000_eigvector_first_half_10_last_half_90_random_N"
 #d_name = "b_rhs_20000_10000_ritz_vectors_first_half_10_last_half_90_random_N63"
 #d_name = "b_rhs_20000_10000_ritz_vectors_V2_for_3D_random_N63"
-d_name = "b_rhs_20000_10000_faulty_ritz_vectors_V2_for_3D_random_N63"
+d_name = "b_rhs_20000_10000_faulty_ritz_vectors_V2_for_3D_random_N127"
 #d_name = "b_rhs_20000_10000_ritz_vectors_combined_3_N63"
 print(d_name)
 

@@ -36,17 +36,20 @@ CG = cg.ConjugateGradientSparse(A_sparse)
 
 #%%
 #This part 
-with open(project_data_folder+'b_rhs_20000_10000_A_cos_vectors_V2_for_3D_random_N'+str(dim-1)+'.npy', 'rb') as f:
+with open(project_data_folder+'b_rhs_20000_10000_faulty_ritz_vectors_V2_for_3D_random_N'+str(dim-1)+'.npy', 'rb') as f:
     ritz_vectors = np.load(f)
 
 num_vectors = 20000
-foldername = project_data_folder+'b_rhs_20000_10000_A_cos_vectors_V2_for_3D_random_N'+str(dim-1)+'/'
+foldername = project_data_folder+'b_rhs_20000_10000_faulty_ritz_vectors_V2_for_3D_random_N'+str(dim-1)+'/'
 
 for i in range(num_vectors):
     if i%100 == 0:
         print(i)
     with open(foldername+str(i)+'.npy', 'wb') as f:
-        np.save(f, ritz_vectors[i])
+        Ar = A_sparse.dot(ritz_vectors[i])
+        Ar = Ar/np.linalg.norm(Ar)
+        np.save(f, np.array(Ar,dtype=np.float32))
+        #np.save(f, ritz_vectors[i])
 
 
 
